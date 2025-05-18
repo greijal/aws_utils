@@ -41,8 +41,16 @@ class ConfigurationManager:
             return AWSConfig.from_dict(config_data)
 
     def save_config(self, config: AWSConfig) -> None:
-        with open(self.config_path, "w") as file:
-            yaml.safe_dump(config.to_dict(), file, **self.YAML_OPTIONS)
+        try:
+            with open(self.config_path, "w") as file:
+                config_dict = config.to_dict()
+                yaml.safe_dump(
+                    config_dict, file, allow_unicode=True, default_flow_style=False
+                )
+        except OSError as e:
+            raise OSError(f"Erro ao salvar arquivo de configuração: {e}")
+        except yaml.YAMLError as e:
+            raise yaml.YAMLError(f"Erro ao serializar configuração YAML: {e}")
 
     def _build_session_args(self, config: AWSConfig) -> Dict[str, str]:
         session_args = {}

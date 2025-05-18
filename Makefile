@@ -51,21 +51,27 @@ docker-down:
 run:
 	$(BIN)/python cli.py
 
-.PHONY: format
-format:
+.PHONY: black
+black:
 	$(BIN)/black src/ tests/
 
 .PHONY: type
 type:
 	$(BIN)/mypy src/
 
-.PHONY: lint
-lint:
+.PHONY: check
+check:
 	$(BIN)/flake8 src/ tests/
 
 .PHONY: isort
 isort:
 	$(BIN)/isort src/ tests/
+
+.PHONY: format
+format:black isort type
+	$(BIN)/flake8 src/ tests/
+
+
 
 .PHONY: help
 help:

@@ -10,3 +10,4 @@ yml
 isort
 questionary
 colorama
+types-PyYAML
