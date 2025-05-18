@@ -48,7 +48,8 @@ class SQSUtils:
         return response.get("Messages", [])
 
     def send_message(self, queue_url: str, body: str) -> None:
-        self.client.send_message(QueueUrl=queue_url, MessageBody=body)
+        response = self.client.send_message(QueueUrl=queue_url, MessageBody=body)
+        print(f"[SQSUtils] Send message response: {response}")
 
     def send_messages_from_file(self, queue_url: str, file_path: str) -> None:
         with open(file_path, "r") as f:
@@ -57,7 +58,9 @@ class SQSUtils:
         entries = [{"Id": str(i), "MessageBody": line} for i, line in enumerate(lines)]
 
         for batch in self._get_batches(entries):
-            self.client.send_message_batch(QueueUrl=queue_url, Entries=batch)
+            response = self.client.send_message_batch(QueueUrl=queue_url, Entries=batch)
+            print(f"[SQSUtils] Send message response: {response}")
+
 
     def _get_batches(self, entries: List[Dict]) -> List[List[Dict]]:
         return [entries[i:i + self.MAX_BATCH_SIZE]
