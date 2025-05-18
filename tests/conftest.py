@@ -1,6 +1,5 @@
 from unittest.mock import Mock, patch
 
-import boto3
 import pytest
 
 

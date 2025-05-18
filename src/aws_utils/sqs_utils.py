@@ -1,5 +1,5 @@
 import webbrowser
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import boto3
 

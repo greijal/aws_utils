@@ -1,6 +1,4 @@
 from unittest.mock import Mock, patch
-
-import boto3
 import pytest
 
 from aws_utils import SQSUtils

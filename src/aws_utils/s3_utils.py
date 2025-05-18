@@ -1,6 +1,6 @@
 import os
 import webbrowser
-from typing import Optional, List
+from typing import List, Optional
 
 import boto3
 from boto3.session import Session

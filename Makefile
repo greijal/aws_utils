@@ -63,6 +63,10 @@ type:
 lint:
 	$(BIN)/flake8 src/ tests/
 
+.PHONY: isort
+isort:
+	$(BIN)/isort src/ tests/
+
 .PHONY: help
 help:
 	@echo "Comandos disponíveis:"

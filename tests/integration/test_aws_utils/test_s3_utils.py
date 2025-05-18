@@ -1,7 +1,6 @@
 import boto3
 import pytest
 
-from aws_utils.s3_utils import S3Utils
 
 LOCALSTACK_ENDPOINT = "http://localhost:4566"
 REGION = "us-east-1"
