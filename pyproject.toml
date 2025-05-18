@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aws-utils-cli"
+version = "0.1.0"
+description = "CLI para facilitar operações com AWS SQS e S3"
+authors = [
+  { name="Seu Nome", email="seu@email.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+dependencies = [
+  "boto3>=1.26.0",
+  "pyyaml>=6.0.1",
+  "questionary",
+  "colorama"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/greijal/aws_utils"
+"Bug Tracker" = "https://github.com/greijal/aws_utils/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+aws-utils-cli = "cli:main"
