@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from aws_utils.configuration import AWSConfig, ConfigurationManager
+from src.aws_utils.configuration import AWSConfig, ConfigurationManager
 
 
 class TestAWSConfig:

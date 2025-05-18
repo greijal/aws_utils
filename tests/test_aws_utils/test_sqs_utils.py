@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 import pytest
 
-from aws_utils import SQSUtils
+from src.aws_utils.sqs_utils import SQSUtils
 
 
 @pytest.fixture

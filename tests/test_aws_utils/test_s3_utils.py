@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_utils import S3Utils
+from src.aws_utils.s3_utils import S3Utils
 
 
 @pytest.fixture

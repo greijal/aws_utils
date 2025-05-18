@@ -28,11 +28,12 @@ class ConfigurationManager:
 
     def __init__(self, config_path: Optional[Path] = None):
         self.config_path = (
-            config_path or Path(__file__).parents[1] / self.DEFAULT_CONFIG_FILENAME
+            config_path or Path(__file__).parents[2] / self.DEFAULT_CONFIG_FILENAME
         )
 
     def load_config(self) -> AWSConfig:
         if not self.config_path.exists():
+            print("Configuration file not found. Using default settings.")
             return AWSConfig()
 
         with open(self.config_path, "r") as file:
