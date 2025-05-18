@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, Optional
 import yaml
@@ -10,16 +10,12 @@ class AWSConfig:
     region: str = ""
     profile: str = ""
 
-    DEFAULT_CONFIG: Dict[str, str] = {
-        'region': '',
-        'profile': ''
-    }
 
     @classmethod
     def from_dict(cls, data: Dict[str, str]) -> 'AWSConfig':
         return cls(
-            region=data.get('region', cls.DEFAULT_CONFIG['region']),
-            profile=data.get('profile', cls.DEFAULT_CONFIG['profile'])
+            region=data.get('region', ''),
+            profile=data.get('profile', '')
         )
 
     def to_dict(self) -> Dict[str, str]:
