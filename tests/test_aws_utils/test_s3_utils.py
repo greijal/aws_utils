@@ -1,6 +1,7 @@
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, call
-import os
+
 from aws_utils.s3_utils import S3Utils
 
 
@@ -8,7 +9,7 @@ from aws_utils.s3_utils import S3Utils
 def mock_s3_client(mock_session):
     mock_client = Mock()
     mock_session.return_value.client.return_value = mock_client
-    mock_client.meta.region_name = 'us-east-1'
+    mock_client.meta.region_name = "us-east-1"
     return mock_client
 
 
@@ -29,10 +30,7 @@ class TestS3Utils:
 
     def test_list_buckets(self, mock_s3_client):
         mock_s3_client.list_buckets.return_value = {
-            "Buckets": [
-                {"Name": "bucket1"},
-                {"Name": "bucket2"}
-            ]
+            "Buckets": [{"Name": "bucket1"}, {"Name": "bucket2"}]
         }
 
         s3_utils = S3Utils()
@@ -41,7 +39,7 @@ class TestS3Utils:
         assert result == ["bucket1", "bucket2"]
         mock_s3_client.list_buckets.assert_called_once()
 
-    @patch('webbrowser.open')
+    @patch("webbrowser.open")
     def test_open_bucket_in_console(self, mock_webbrowser, mock_s3_client):
         s3_utils = S3Utils()
         s3_utils.open_bucket_in_console("test-bucket")
@@ -49,14 +47,12 @@ class TestS3Utils:
         expected_url = "https://s3.console.aws.amazon.com/s3/buckets/test-bucket?region=us-east-1&tab=objects"
         mock_webbrowser.assert_called_once_with(expected_url)
 
-
     def test_delete_object_success(self, mock_s3_client):
         s3_utils = S3Utils()
         s3_utils.delete_object("test-bucket", "test-key")
 
         mock_s3_client.delete_object.assert_called_once_with(
-            Bucket="test-bucket",
-            Key="test-key"
+            Bucket="test-bucket", Key="test-key"
         )
 
     def test_delete_object_missing_params(self):
@@ -71,7 +67,7 @@ class TestS3Utils:
         with pytest.raises(Exception, match="Test error"):
             s3_utils.delete_object("test-bucket", "test-key")
 
-    @patch('os.path.exists')
+    @patch("os.path.exists")
     def test_upload_file(self, mock_exists, mock_s3_client):
         mock_exists.return_value = True
         s3_utils = S3Utils()
@@ -79,9 +75,7 @@ class TestS3Utils:
         s3_utils.upload_file("local/path.txt", "test-bucket", "remote/path.txt")
 
         mock_s3_client.upload_file.assert_called_once_with(
-            "local/path.txt",
-            "test-bucket",
-            "remote/path.txt"
+            "local/path.txt", "test-bucket", "remote/path.txt"
         )
 
     def test_upload_file_not_found(self):

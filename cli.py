@@ -1,10 +1,12 @@
+from abc import ABC, abstractmethod
+
 import questionary
 import yaml
-from abc import ABC, abstractmethod
 from colorama import Fore, Style, init
-from src.aws_utils.sqs_utils import SQSUtils
-from src.aws_utils.s3_utils import S3Utils
+
 from src.aws_utils.configuration import ConfigurationManager, AWSConfig
+from src.aws_utils.s3_utils import S3Utils
+from src.aws_utils.sqs_utils import SQSUtils
 
 
 class MenuOptions:

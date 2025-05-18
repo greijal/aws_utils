@@ -1,6 +1,7 @@
-from typing import List, Dict, Optional
-import boto3
 import webbrowser
+from typing import List, Dict, Optional
+
+import boto3
 
 
 class SQSUtils:
@@ -18,21 +19,21 @@ class SQSUtils:
 
     def get_message_count(self, queue_url: str) -> int:
         attrs = self.client.get_queue_attributes(
-            QueueUrl=queue_url,
-            AttributeNames=self.MSG_COUNT_ATTRIBUTE
+            QueueUrl=queue_url, AttributeNames=self.MSG_COUNT_ATTRIBUTE
         )
         return int(attrs["Attributes"]["ApproximateNumberOfMessages"])
 
     def open_in_console(self, queue_url: str, region: Optional[str] = None) -> None:
         region = region or self.client.meta.region_name
         queue_name = queue_url.split("/")[-1]
-        console_url = self.CONSOLE_URL_TEMPLATE.format(region=region, queue_name=queue_name)
+        console_url = self.CONSOLE_URL_TEMPLATE.format(
+            region=region, queue_name=queue_name
+        )
         webbrowser.open(console_url)
 
     def get_attributes(self, queue_url: str) -> Dict:
         response = self.client.get_queue_attributes(
-            QueueUrl=queue_url,
-            AttributeNames=self.ALL_ATTRIBUTES
+            QueueUrl=queue_url, AttributeNames=self.ALL_ATTRIBUTES
         )
         return response.get("Attributes", {})
 
@@ -43,7 +44,7 @@ class SQSUtils:
         response = self.client.receive_message(
             QueueUrl=queue_url,
             MaxNumberOfMessages=self.MAX_BATCH_SIZE,
-            WaitTimeSeconds=2
+            WaitTimeSeconds=2,
         )
         return response.get("Messages", [])
 
@@ -61,7 +62,8 @@ class SQSUtils:
             response = self.client.send_message_batch(QueueUrl=queue_url, Entries=batch)
             print(f"[SQSUtils] Send message response: {response}")
 
-
     def _get_batches(self, entries: List[Dict]) -> List[List[Dict]]:
-        return [entries[i:i + self.MAX_BATCH_SIZE]
-                for i in range(0, len(entries), self.MAX_BATCH_SIZE)]
+        return [
+            entries[i : i + self.MAX_BATCH_SIZE]
+            for i in range(0, len(entries), self.MAX_BATCH_SIZE)
+        ]

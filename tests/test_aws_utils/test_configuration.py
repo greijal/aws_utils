@@ -1,6 +1,7 @@
-import pytest
 from pathlib import Path
-import yaml
+
+import pytest
+
 from aws_utils.configuration import AWSConfig, ConfigurationManager
 
 
@@ -89,11 +90,14 @@ class TestConfigurationManager:
         args = manager._build_session_args(config)
         assert args == {"region_name": "us-east-1", "profile_name": "test"}
 
-    @pytest.mark.parametrize("config_data,expected_args", [
-        ({"region": "us-east-1"}, {"region_name": "us-east-1"}),
-        ({"profile": "dev"}, {"profile_name": "dev"}),
-        ({}, {})
-    ])
+    @pytest.mark.parametrize(
+        "config_data,expected_args",
+        [
+            ({"region": "us-east-1"}, {"region_name": "us-east-1"}),
+            ({"profile": "dev"}, {"profile_name": "dev"}),
+            ({}, {}),
+        ],
+    )
     def test_build_session_args_variants(self, config_data, expected_args):
         manager = ConfigurationManager()
         config = AWSConfig.from_dict(config_data)

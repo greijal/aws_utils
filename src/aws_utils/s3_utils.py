@@ -1,7 +1,8 @@
-from typing import Optional, List
-import boto3
-import webbrowser
 import os
+import webbrowser
+from typing import Optional, List
+
+import boto3
 from boto3.session import Session
 
 
@@ -42,19 +43,25 @@ class S3Utils:
             self._log(f"Error deleting object: {e}")
             raise
 
-    def upload_file(self, file_path: str, bucket: str, key: Optional[str] = None) -> None:
+    def upload_file(
+        self, file_path: str, bucket: str, key: Optional[str] = None
+    ) -> None:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
 
         key = key or os.path.basename(file_path)
-        self._log(f"Uploading file '{file_path}' to bucket '{bucket}' with key '{key}'...")
+        self._log(
+            f"Uploading file '{file_path}' to bucket '{bucket}' with key '{key}'..."
+        )
         self.client.upload_file(file_path, bucket, key)
 
     def upload_directory(self, dir_path: str, bucket: str, prefix: str = "") -> None:
         if not os.path.isdir(dir_path):
             raise NotADirectoryError(f"Directory not found: {dir_path}")
 
-        self._log(f"Uploading directory '{dir_path}' to bucket '{bucket}' with prefix '{prefix}'...")
+        self._log(
+            f"Uploading directory '{dir_path}' to bucket '{bucket}' with prefix '{prefix}'..."
+        )
         for root, _, files in os.walk(dir_path):
             for file in files:
                 local_path = os.path.join(root, file)
