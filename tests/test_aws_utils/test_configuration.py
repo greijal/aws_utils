@@ -2,44 +2,44 @@ from pathlib import Path
 
 import pytest
 
-from src.aws_utils.configuration import AWSConfig, ConfigurationManager
+from src.aws_utils.configuration import Config, ConfigurationManager
 
 
 class TestAWSConfig:
     def test_default_config(self):
-        config = AWSConfig()
+        config = Config()
         assert config.region == ""
         assert config.profile == ""
         assert not config.is_valid()
 
     def test_custom_config(self):
-        config = AWSConfig(region="us-east-1", profile="dev")
+        config = Config(region="us-east-1", profile="dev")
         assert config.region == "us-east-1"
         assert config.profile == "dev"
         assert config.is_valid()
 
     def test_from_dict_empty(self):
-        config = AWSConfig.from_dict({})
+        config = Config.from_dict({})
         assert config.region == ""
         assert config.profile == ""
 
     def test_from_dict_with_data(self):
         data = {"region": "eu-west-1", "profile": "prod"}
-        config = AWSConfig.from_dict(data)
+        config = Config.from_dict(data)
         assert config.region == "eu-west-1"
         assert config.profile == "prod"
 
     def test_to_dict(self):
-        config = AWSConfig(region="ap-south-1", profile="test")
+        config = Config(region="ap-south-1", profile="test")
         expected = {"region": "ap-south-1", "profile": "test"}
         assert config.to_dict() == expected
 
     def test_is_valid_with_region(self):
-        config = AWSConfig(region="us-west-2")
+        config = Config(region="us-west-2")
         assert config.is_valid()
 
     def test_is_valid_with_profile(self):
-        config = AWSConfig(profile="default")
+        config = Config(profile="default")
         assert config.is_valid()
 
 
@@ -56,7 +56,7 @@ class TestConfigurationManager:
     def test_load_config_nonexistent_file(self, tmp_path):
         manager = ConfigurationManager(tmp_path / "nonexistent.yaml")
         config = manager.load_config()
-        assert isinstance(config, AWSConfig)
+        assert isinstance(config, Config)
         assert not config.is_valid()
 
     def test_load_config_empty_file(self, tmp_path):
@@ -64,14 +64,14 @@ class TestConfigurationManager:
         config_path.touch()
         manager = ConfigurationManager(config_path)
         config = manager.load_config()
-        assert isinstance(config, AWSConfig)
+        assert isinstance(config, Config)
         assert not config.is_valid()
 
     def test_save_and_load_config(self, tmp_path):
         config_path = tmp_path / "config.yaml"
         manager = ConfigurationManager(config_path)
 
-        original_config = AWSConfig(region="us-east-1", profile="test")
+        original_config = Config(region="us-east-1", profile="test")
         manager.save_config(original_config)
 
         loaded_config = manager.load_config()
@@ -80,13 +80,13 @@ class TestConfigurationManager:
 
     def test_build_session_args_empty(self):
         manager = ConfigurationManager()
-        config = AWSConfig()
+        config = Config()
         args = manager._build_session_args(config)
         assert args == {}
 
     def test_build_session_args_full(self):
         manager = ConfigurationManager()
-        config = AWSConfig(region="us-east-1", profile="test")
+        config = Config(region="us-east-1", profile="test")
         args = manager._build_session_args(config)
         assert args == {"region_name": "us-east-1", "profile_name": "test"}
 
@@ -100,6 +100,6 @@ class TestConfigurationManager:
     )
     def test_build_session_args_variants(self, config_data, expected_args):
         manager = ConfigurationManager()
-        config = AWSConfig.from_dict(config_data)
+        config = Config.from_dict(config_data)
         args = manager._build_session_args(config)
         assert args == expected_args

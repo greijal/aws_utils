@@ -4,7 +4,7 @@ import questionary
 import yaml
 from colorama import Fore, Style, init
 
-from src.aws_utils.configuration import ConfigurationManager, AWSConfig
+from src.aws_utils.configuration import ConfigurationManager, Config
 from src.aws_utils.s3_utils import S3Utils
 from src.aws_utils.sqs_utils import SQSUtils
 
@@ -80,8 +80,8 @@ class SQSActionExecutor(MenuHandler):
     def _list_queues(self):
         queue_list = self.sqs.list_queues()
         print(Fore.GREEN + "Found queues:")
-        for queue in queue_list:
-            print(Fore.YELLOW + queue)
+        for queue_url, queue_name in queue_list:
+            print(Fore.YELLOW + f"{queue_name} - ({queue_url})")
 
     def _display_message_count(self):
         queue_url = select_queue(self.sqs)
@@ -206,7 +206,7 @@ def main():
         elif choice == "Configure":
             region = questionary.text("Enter default region:").ask()
             profile = questionary.text("Enter default profile:").ask()
-            config = AWSConfig(
+            config = Config(
                 profile=profile.strip(),
                 region=region.strip()
             )

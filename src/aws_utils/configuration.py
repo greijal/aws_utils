@@ -7,40 +7,48 @@ import yaml
 
 
 @dataclass
-class AWSConfig:
+class Config:
     region: str = ""
     profile: str = ""
+    sqs: str = ""
+    bucket: str = ""
 
     @classmethod
-    def from_dict(cls, data: Dict[str, str]) -> "AWSConfig":
-        return cls(region=data.get("region", ""), profile=data.get("profile", ""))
+    def from_dict(cls, data: Dict[str, str]) -> "Config":
+        return cls(region=data.get("region", ""),
+                   profile=data.get("profile", ""),
+                   sqs=data.get("sqs", ""),
+                   bucket=data.get("bucket", ""))
 
     def to_dict(self) -> Dict[str, str]:
-        return {"region": self.region, "profile": self.profile}
+        return {
+            "region": self.region,
+            "profile": self.profile,
+            "sqs": self.sqs,
+            "bucket": self.bucket
+        }
 
     def is_valid(self) -> bool:
         return bool(self.region or self.profile)
 
 
 class ConfigurationManager:
-    DEFAULT_CONFIG_FILENAME = "config.yaml"
+    DEFAULT_CONFIG_FILENAME = ".awsutills"
     YAML_OPTIONS = {"allow_unicode": True, "default_flow_style": False}
 
     def __init__(self, config_path: Optional[Path] = None):
-        self.config_path = (
-            config_path or Path(__file__).parents[2] / self.DEFAULT_CONFIG_FILENAME
-        )
+        self.config_path = config_path or Path.home() / self.CONFIG_FILENAME
 
-    def load_config(self) -> AWSConfig:
+    def load_config(self) -> Config:
         if not self.config_path.exists():
             print("Configuration file not found. Using default settings.")
-            return AWSConfig()
+            return Config()
 
         with open(self.config_path, "r") as file:
             config_data = yaml.safe_load(file) or {}
-            return AWSConfig.from_dict(config_data)
+            return Config.from_dict(config_data)
 
-    def save_config(self, config: AWSConfig) -> None:
+    def save_config(self, config: Config) -> None:
         try:
             with open(self.config_path, "w") as file:
                 config_dict = config.to_dict()
@@ -52,7 +60,7 @@ class ConfigurationManager:
         except yaml.YAMLError as e:
             raise yaml.YAMLError(f"Erro ao serializar configuração YAML: {e}")
 
-    def _build_session_args(self, config: AWSConfig) -> Dict[str, str]:
+    def _build_session_args(self, config: Config) -> Dict[str, str]:
         session_args = {}
         if config.region:
             session_args["region_name"] = config.region

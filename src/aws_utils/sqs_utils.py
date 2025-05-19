@@ -1,6 +1,6 @@
 import webbrowser
 from typing import Dict, List, Optional
-
+from configuration import ConfigurationManager
 import boto3
 
 
@@ -12,19 +12,35 @@ class SQSUtils:
 
     def __init__(self, session: Optional[boto3.Session] = None) -> None:
         self.client = (session or boto3.Session()).client("sqs")
+        self.config_manager = ConfigurationManager()
 
-    def get_queues(self) -> List[str]:
+    def list_queues(self) -> List[str]:
+
         response = self.client.list_queues()
-        return response.get("QueueUrls", [])
+        list_queues = response.get("QueueUrls", [])
+        while response.get("NextToken"):
+            response = self.client.list_queues(NextToken=response["NextToken"])
+            list_queues.extend(response.get("QueueUrls", []))
 
-    def get_message_count(self, queue_url: str) -> int:
+        return [(queue,queue.split("/")[-1]) for queue in list_queues]
+
+
+    def get_message_count(self, queue_url: Optional[str] = None) -> int:
+        if not queue_url:
+            queue_url = self.config_manager.load_config().sqs
         attrs = self.client.get_queue_attributes(
             QueueUrl=queue_url, AttributeNames=self.MSG_COUNT_ATTRIBUTE
         )
         return int(attrs["Attributes"]["ApproximateNumberOfMessages"])
 
-    def open_in_console(self, queue_url: str, region: Optional[str] = None) -> None:
-        region = region or self.client.meta.region_name
+    def open_in_console(self, queue_url: Optional[Optional] = None,
+                        region: Optional[str] = None) -> None:
+
+        if not queue_url:
+            queue_url = self.config_manager.load_config().sqs
+        if not region:
+            region = self.config_manager.load_config().region
+
         queue_name = queue_url.split("/")[-1]
         console_url = self.CONSOLE_URL_TEMPLATE.format(
             region=region, queue_name=queue_name
@@ -38,7 +54,7 @@ class SQSUtils:
         return response.get("Attributes", {})
 
     def purge(self, queue_url: str) -> None:
-        self.client.purge_queue(QueueUrl=queue_url)
+        self.client.pu(QueueUrl=queue_url)
 
     def receive_messages(self, queue_url: str) -> List[Dict]:
         response = self.client.receive_message(
